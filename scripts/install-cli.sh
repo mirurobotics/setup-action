@@ -104,7 +104,14 @@ resolve_version() {
         log "Using version: $VERSION"
     else
         log "Fetching latest version..."
-        API_RESPONSE=$(retry curl -sSL "$API_URL") || error "Failed to reach GitHub API: $API_URL"
+        
+        # Use authentication if GITHUB_TOKEN is set (avoids rate limits)
+        if [ -n "$GITHUB_TOKEN" ]; then
+            API_RESPONSE=$(retry curl -sSL -H "Authorization: token $GITHUB_TOKEN" "$API_URL") \
+                || error "Failed to reach GitHub API: $API_URL"
+        else
+            API_RESPONSE=$(retry curl -sSL "$API_URL") || error "Failed to reach GitHub API: $API_URL"
+        fi
         
         # Check for error response from GitHub
         if echo "$API_RESPONSE" | grep -q '"message"'; then
