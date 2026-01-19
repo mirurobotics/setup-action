@@ -66,6 +66,7 @@ class MockConfig:
     bad_checksum: bool = False
     corrupt_tarball: bool = False
     slow_download: float = 0  # Delay in seconds
+    api_error_message: str = ""  # Simulate GitHub API error response (e.g., "Not Found")
 
 
 class MockCurl:
@@ -88,7 +89,9 @@ class MockCurl:
         cfg = self.config
 
         # API response
-        if cfg.empty_response:
+        if cfg.api_error_message:
+            api_response = f'{{"message": "{cfg.api_error_message}"}}'
+        elif cfg.empty_response:
             api_response = "{}"
         else:
             api_response = f'{{"tag_name": "{cfg.version}"}}'

@@ -113,13 +113,22 @@ class TestFailure:
         assert_error(result, "api.github.com")
 
     def test_api_empty_response(self, mock_curl: MockCurl, temp_dir: Path):
-        """Error message explains parsing failed."""
+        """Error message shows the GitHub response when parsing fails."""
         mock_curl.config.empty_response = True
         mock_curl.setup()
 
         result = run_install(install_dir=temp_dir, mock_curl=mock_curl)
 
-        assert_error(result, "parse", "version")
+        assert_error(result, "Could not parse version")
+
+    def test_api_error_response(self, mock_curl: MockCurl, temp_dir: Path):
+        """Error message shows the full GitHub API error response."""
+        mock_curl.config.api_error_message = "Not Found"
+        mock_curl.setup()
+
+        result = run_install(install_dir=temp_dir, mock_curl=mock_curl)
+
+        assert_error(result, "GitHub API error", "Not Found")
 
     def test_download_fails(self, mock_curl: MockCurl, temp_dir: Path):
         """Error message includes the download URL."""

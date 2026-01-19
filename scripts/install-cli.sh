@@ -104,9 +104,15 @@ resolve_version() {
         log "Using version: $VERSION"
     else
         log "Fetching latest version..."
-        API_RESPONSE=$(retry curl -sL "$API_URL") || error "Failed to reach GitHub API: $API_URL"
+        API_RESPONSE=$(retry curl -sSL "$API_URL") || error "Failed to reach GitHub API: $API_URL"
+        
+        # Check for error response from GitHub
+        if echo "$API_RESPONSE" | grep -q '"message"'; then
+            error "GitHub API error: $API_RESPONSE"
+        fi
+        
         VERSION=$(echo "$API_RESPONSE" | grep "tag_name" | cut -d '"' -f 4)
-        [ -z "$VERSION" ] && error "Could not parse version from GitHub API response"
+        [ -z "$VERSION" ] && error "Could not parse version from GitHub API response: $API_RESPONSE"
         log "Latest version: $VERSION"
     fi
 }
