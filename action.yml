@@ -1,0 +1,28 @@
+name: 'Setup Miru CLI'
+description: 'Install the Miru CLI'
+author: 'Miru Robotics'
+branding:
+  icon: 'download'
+  color: 'purple'
+
+inputs:
+  cli-version:
+    description: 'Miru CLI version to install (e.g., v1.2.3). Defaults to latest.'
+    required: false
+    default: 'latest'
+
+outputs:
+  cli-version:
+    description: 'The version of the CLI that was installed'
+    value: ${{ steps.install.outputs.version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Miru CLI
+      id: install
+      shell: sh
+      env:
+        CLI_VERSION: ${{ inputs.cli-version }}
+      run: ${{ github.action_path }}/scripts/install-cli.sh
+
