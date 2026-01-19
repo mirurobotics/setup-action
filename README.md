@@ -20,7 +20,7 @@ steps:
     uses: mirurobotics/setup-miru@v0
 
   - name: Verify installation
-    run: miru --version
+    run: miru version
 ```
 
 ### Pin to a Specific Version
@@ -103,9 +103,7 @@ jobs:
 
       - name: Run Miru commands
         run: |
-          miru --version
-          miru build
-          miru test
+          miru version
 ```
 
 ### Matrix Build Across Platforms

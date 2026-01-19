@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify installation
         run: |
-          miru --version
+          miru version
           echo "Installed version: ${{ steps.setup.outputs.cli-version }}"
 
   version-pin-test:
@@ -68,7 +68,7 @@ jobs:
 
       - name: Verify pinned version
         run: |
-          version=$(miru --version)
+          version=$(miru version)
           echo "Installed: $version"
           echo "$version" | grep -q "0.8.0"
 
