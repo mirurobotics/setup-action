@@ -1,63 +1,98 @@
-name: Test
+name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Run pytest
+      - name: Run tests
         working-directory: tests
-        run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install -r requirements.txt
-          pytest -v
+        run: ./tests/run.sh
 
-  install-test:
+  integration-test:
+    name: Integration (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
           # Linux
           - os: ubuntu-24.04
-            name: Ubuntu 24.04
           - os: ubuntu-22.04
-            name: Ubuntu 22.04
           - os: ubuntu-slim
-            name: Ubuntu Slim
           # macOS Apple Silicon
           - os: macos-15
-            name: macOS 15 (arm64)
           - os: macos-14
-            name: macOS 14 (arm64)
           # macOS Intel
           - os: macos-15-intel
-            name: macOS 15 (x86_64)
-
-    runs-on: ${{ matrix.os }}
-    name: Install (${{ matrix.name }})
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Run install script
+      - name: Setup Miru CLI
+        id: setup
+        uses: ./
+
+      - name: Verify installation
         run: |
-          # Install to temp directory (no sudo needed)
-          export INSTALL_DIR="$HOME/.local/bin"
-          mkdir -p "$INSTALL_DIR"
-          
-          sh scripts/install.sh --version=v0.7.0
-          
-          # Verify binary works
-          "$INSTALL_DIR/miru" --version
+          miru --version
+          echo "Installed version: ${{ steps.setup.outputs.cli-version }}"
 
+  version-pin-test:
+    name: Version Pin Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Miru CLI (pinned)
+        id: setup
+        uses: ./
+        with:
+          cli-version: 'v0.8.0'
+
+      - name: Verify pinned version
+        run: |
+          version=$(miru --version)
+          echo "Installed: $version"
+          echo "$version" | grep -q "0.8.0"
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Shellcheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './scripts'
+          severity: warning
+
+  action-lint:
+    name: Action Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate action.yml
+        uses: mpalmer/action-validator@v0.6.0
+        with:
+          file: action.yml
