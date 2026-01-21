@@ -18,16 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Update major version tag
+      - name: Update major and minor version tags
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           MAJOR=${VERSION%%.*}
+          MINOR=${VERSION%.*}
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           git tag -fa "$MAJOR" -m "Update $MAJOR to $VERSION"
-          git push origin "$MAJOR" --force
+          git tag -fa "$MINOR" -m "Update $MINOR to $VERSION"
+          git push origin "$MAJOR" "$MINOR" --force
 
       - name: Create GitHub Release
         env:
