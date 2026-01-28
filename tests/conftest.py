@@ -53,7 +53,7 @@ def assert_install_success(result: subprocess.CompletedProcess, verbose: bool = 
 # Mock Infrastructure
 # =============================================================================
 
-LATEST_VERSION = "v0.8.0"
+LATEST_VERSION = "v0.9.0"
 
 
 @dataclass

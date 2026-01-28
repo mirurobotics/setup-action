@@ -59,18 +59,18 @@ class TestSuccess:
         assert_install_success(result)
         assert LATEST_VERSION in result.stdout
 
-    def test_version_alias_v0_8(self, mock_curl: MockCurl, temp_dir: Path):
-        """Version alias v0.8 maps to v0.8.0."""
-        mock_curl.config.version = "v0.8.0"
+    def test_version_alias_v0_9(self, mock_curl: MockCurl, temp_dir: Path):
+        """Version alias v0.9 maps to v0.9.0."""
+        mock_curl.config.version = "v0.9.0"
         mock_curl.setup()
 
-        result = run_install("--version=v0.8", install_dir=temp_dir, mock_curl=mock_curl)
+        result = run_install("--version=v0.9", install_dir=temp_dir, mock_curl=mock_curl)
 
         assert_install_success(result)
         assert LATEST_VERSION in result.stdout
 
     def test_version_latest_lowercase(self, mock_curl: MockCurl, temp_dir: Path):
-        """Version 'latest' maps to v0.8.0."""
+        """Version 'latest' maps to latest version."""
         mock_curl.config.version = LATEST_VERSION
         mock_curl.setup()
 
@@ -80,7 +80,7 @@ class TestSuccess:
         assert LATEST_VERSION in result.stdout
 
     def test_version_latest_capitalized(self, mock_curl: MockCurl, temp_dir: Path):
-        """Version 'Latest' maps to v0.8.0."""
+        """Version 'Latest' maps to latest version."""
         mock_curl.config.version = LATEST_VERSION
         mock_curl.setup()
 
@@ -90,7 +90,7 @@ class TestSuccess:
         assert LATEST_VERSION in result.stdout
 
     def test_version_latest_uppercase(self, mock_curl: MockCurl, temp_dir: Path):
-        """Version 'LATEST' maps to v0.8.0."""
+        """Version 'LATEST' maps to latest version."""
         mock_curl.config.version = LATEST_VERSION
         mock_curl.setup()
 
@@ -100,7 +100,7 @@ class TestSuccess:
         assert LATEST_VERSION in result.stdout
 
     def test_version_latest_via_env(self, mock_curl: MockCurl, temp_dir: Path):
-        """Version 'latest' via INPUT_VERSION env var maps to v0.8.0."""
+        """Version 'latest' via INPUT_VERSION env var maps to latest."""
         mock_curl.config.version = LATEST_VERSION
         mock_curl.setup()
 
